@@ -1,0 +1,130 @@
+---
+title: "Case Study: How does a bike-share navigate speedy success?"
+author: "Treesa Sabu"
+output: html_document
+date: "2024-05-10"
+---
+
+## Introduction
+
+In 2016, Cyclistic launched a successful bike-share offering. Since then, the program has grown to a fleet of 5,824 bicycles that are geotracked and locked into a network of 692 stations across Chicago. The bikes can be unlocked from one station and returned to any other station in the system anytime.
+Until now, Cyclistic’s marketing strategy relied on building general awareness and appealing to broad consumer segments. One approach that helped make these things possible was the flexibility of its pricing plans: single-ride passes, full-day passes, and annual memberships. Customers who purchase single-ride or full-day passes are referred to as casual riders. Customers who purchase annual memberships are Cyclistic members.
+
+Cyclistic’s finance analysts have concluded that annual members are much more profitable than casual riders. Although the pricing flexibility helps Cyclistic attract more customers, Analysts believes that maximizing the number of annual members will be key to future growth. Rather than creating a marketing campaign that targets all-new customers, Moreno believes there is a solid opportunity to convert casual riders into members. They notes that casual riders are already aware of the Cyclistic program and have chosen Cyclistic for their mobility needs.
+
+## Problems
+
+Design marketing strategies aimed at converting casual riders into annual members.In order to do that, however, the team needs to better understand how annual members and casual riders differ, why casual riders would buy a membership, and how digital media could affect their marketing tactics.
+
+* How do annual members and casual riders use Cyclistic bikes differently?
+
+This is what we are planning to find the answer from this case study.
+
+## Solutions
+
+The data for the analysis is downloaded from <https://divvy-tripdata.s3.amazonaws.com/index.html>. Last 12 month data (2023 May to 2024 April) is used for the analysis.
+
+```{r importing libraries}
+library(dplyr)
+library(tidyverse)
+library(skimr)
+library(janitor)
+library(readr)
+library(ggplot2)
+```
+```{r merging 12 months data}
+df <- list.files(path="E:/MBA/Cousera/Assignments/data analytics/bike/csv", full.names = TRUE) %>% lapply(read_csv) %>% bind_rows 
+```
+```{r cleaning data}
+#dropping all not available values rows
+cleaned_data <- df %>% drop_na()
+head(cleaned_data)
+str(cleaned_data)
+glimpse(cleaned_data)
+```
+finding the summary of total share of casual and member riders
+```{r summary of total share of casual and member riders}
+total_summary <- cleaned_data %>% group_by(member_casual) %>% summarise(totalCount =n(), .groups = 'drop')
+total_summary
+```
+
+finding top and bottom starting stations for casual riders
+```{r filtering top and bottom stations with casual riders}
+filter_casual <- cleaned_data %>% filter(member_casual=='casual')
+summary_casual <- filter_casual %>% group_by(start_station_name) %>% summarise(totalCount =n(), .groups = 'drop')
+arrange_casual = as.data.frame(summary_casual)
+arrange_casual = arrange_casual %>% arrange(-totalCount)
+top_10_casual = head(arrange_casual, 10)
+bottom_10_casual = tail(arrange_casual, 10)
+top_10_casual
+bottom_10_casual
+```
+
+finding top and bottom starting stations for member riders
+```{r filtering top and bottom stations with member riders}
+filter_member <- cleaned_data %>% filter(member_casual=='member')
+summary_member <- filter_member %>% group_by(start_station_name) %>% summarise(totalCount =n(), .groups = 'drop')
+arrange_member = as.data.frame(summary_member)
+arrange_member = arrange_member %>% arrange(-totalCount)
+top_10_member = head(arrange_member, 10)
+bottom_10_member = tail(arrange_member, 10)
+top_10_member
+bottom_10_member
+```
+
+finding top and bottom end stations for casual riders
+```{r filtering top and bottom end stations with casual riders}
+filter_casual <- cleaned_data %>% filter(member_casual=='casual')
+summary_casual <- filter_casual %>% group_by(end_station_name) %>% summarise(totalCount =n(), .groups = 'drop')
+arrange_casual = as.data.frame(summary_casual)
+arrange_casual = arrange_casual %>% arrange(-totalCount)
+top_10_casual = head(arrange_casual, 10)
+bottom_10_casual = tail(arrange_casual, 10)
+top_10_casual
+bottom_10_casual
+```
+
+finding top and bottom end stations for member riders
+```{r filtering top and bottom end stations with member riders}
+filter_member <- cleaned_data %>% filter(member_casual=='member')
+summary_member <- filter_member %>% group_by(end_station_name) %>% summarise(totalCount =n(), .groups = 'drop')
+arrange_member = as.data.frame(summary_member)
+arrange_member = arrange_member %>% arrange(-totalCount)
+top_10_member = head(arrange_member, 10)
+bottom_10_member = tail(arrange_member, 10)
+top_10_member
+bottom_10_member
+```
+
+The below code snippet will plot the rideable type v/s number for each type member of casual.
+```{r plotting data-rideable_type}
+plot_biketype_and_member <- ggplot(data=cleaned_data) + geom_bar(mapping = aes(x=rideable_type, fill=member_casual))
+plot_biketype_and_member
+```
+
+The below code snippet will plot the start station v/s number for each type member of casual.
+```{r plotting data-start station}
+plot_start_and_member <- ggplot(data=cleaned_data) + geom_bar(mapping = aes(x=start_station_name, fill=member_casual))
+plot_start_and_member
+```
+
+The below code snippet will plot the end station v/s number for each type member of casual.
+```{r plotting data-end station}
+plot_end_and_member <- ggplot(data=cleaned_data) + geom_bar(mapping = aes(x=end_station_name, fill=member_casual))
+plot_start_and_member
+```
+
+## Conclusion
+
+* A total of 4335839 observations were subject for study after cleaning the data.
+* 1524678 were casual riders and 2811161 were member riders.
+* classic bikes and electric bikes were mostly used by member riders. only half this used by casual riders but in the case of docked bikes it was exclusevely used by casual riders.
+* Streeter Dr & Grand Ave is the main starting and ending station of casual riders.
+* Clinton St & Washington Blvd is the main starting and ending station of member riders.
+
+
+## Next Steps
+
+* Can provide better plans for docked bikes will attract more casual riders to member riders.
+* Can have better marketing strategy implement in stations like Streeter Dr & Grand Ave.
+
